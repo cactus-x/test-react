@@ -1,0 +1,193 @@
+import React from "react";
+import InputElement from "../common/InputElement";
+export default class StudentManage extends React.Component{
+            constructor(props){
+                super(props);
+                this.state={
+            
+                }
+            }
+            render(){
+                return <div>
+                    <label style={{width:"120px",textAlign:"right",display:"inline-block"}}>{this.props.children}</label>
+                    <input type={this.props.type} onBlur={this.props.validate} ref="input" />
+                    <span style={this.props.style}>{this.props.info}</span>
+                </div>
+            }
+        };
+        let Reg = React.createClass({
+            getInitialState:function(){
+                return {
+                    username:{
+                        info:"",
+                        style:{},
+                        isok:false
+                    },
+                    pwd:{
+                        info:"",
+                        style:{},
+                        pwdtext:"",
+                        isok:false
+                    },
+                    ispwd:{
+                        info:"",
+                        style:{},
+                        isok:false
+                    },
+                    email:{
+                        info:"",
+                        style:{},
+                        isok:false
+                    }
+                }
+            },
+            validateUsername:function(e){
+                if(/^\w{6,20}$/.test(e.target.value)){
+                     var a=e.target.value;
+                ajax({
+                        type:"get",
+                    url:"/user/find",
+                    data:{
+                        name:e.target.value,
+                        findType:"exact"
+                    },
+                         success:(data)=>{
+                             console.log(data);
+                             console.log(typeof(data));
+                             if(data.length==0){
+                                 this.setState({
+                                     username:{
+                                         info:"√",
+                                         style:{
+                                         color:"green"},
+                                     pwdtext:a,
+                                     isok:true}
+                                 });
+                             }else{
+                                 this.setState({
+                        username:{
+                            info:"用户名被注册",
+                            style:{
+                                color:"red"
+                            },
+                            isok:false
+                        }
+                    });
+                             }
+                         }
+                    })
+                }else{
+                    this.setState({
+                        username:{
+                            info:"格式不正确",
+                            style:{
+                                color:"red"
+                            },
+                            isok:false
+                        }
+                    });
+                }
+            },
+            validatepwd:function(e){
+                if(/^\w{6,20}$/.test(e.target.value)){
+                     this.setState({
+                    pwd:{
+                            info:"√",
+                            style:{
+                                color:"green"
+                            },
+                        pwdtext:e.target.value,isok:true
+                        }
+                    });
+                }else{
+                    this.setState({
+                        pwd:{
+                            info:"格式不正确",
+                            style:{
+                                color:"red"
+                            },
+                        pwdtext:e.target.value,isok:false
+                        }
+                    });
+                }
+            },
+            validateispwd:function(e){
+                if(this.state.pwd.pwdtext==e.target.value){
+                    this.setState({
+                    ispwd:{
+                            info:"√",
+                            style:{
+                                color:"green"
+                            },isok:true
+                        }
+                    });
+                }else{
+                    this.setState({
+                        ispwd:{
+                            info:"格式不正确",
+                            style:{
+                                color:"red"
+                            },isok:false
+                        }
+                    });
+                }
+            },
+            validateemail:function(e){
+                if(/^\w{3,}@[a-zA-Z0-9]{2,}.[a-zA-Z]{2,}$/.test(e.target.value)){
+                    this.setState({
+                    email:{
+                            info:"√",
+                            style:{
+                                color:"green"
+                            },isok:true
+                        }
+                    });
+                }else{
+                    this.setState({
+                        email:{
+                            info:"格式不正确",
+                            style:{
+                                color:"red"
+                            },isok:false
+                        }
+                    });
+                }
+            },
+            isreg:function(){
+ if(this.state.username.isok&&this.state.pwd.isok&&this.state.ispwd.isok&&this.state.email.isok){
+ console.log("name:"+this.refs.username.refs.input.value+"pwd"+this.refs.pwd.refs.input.value);
+                    ajax({
+                        type:"post",
+                        url:"/user/add",
+                        data:{name:this.refs.username.refs.input.value,
+                              password:this.refs.pwd.refs.input.value
+                             },
+                        success:function(){
+                            location.replace("stumansge.html");
+                        }
+                    })
+                   }
+            },
+            render:function(){
+                return <form name="newfrom">
+                    <h1 style={{textAlign:"center"}}>注册</h1>
+                    <InputElement ref="username" type="text" name="name"
+                         info={this.state.username.info}
+                         style={this.state.username.style}
+                         validate={this.validateUsername}>用户名：</InputElement>
+                    <InputElement type="password" info="ok" name="pwd" ref="pwd"
+                        info={this.state.pwd.info}
+                         style={this.state.pwd.style}
+                         validate={this.validatepwd}>密码：</InputElement>
+                    <InputElement type="password" info="ok" 
+                        info={this.state.ispwd.info}
+                         style={this.state.ispwd.style}
+                         validate={this.validateispwd}>确认密码：</InputElement>
+                    <InputElement type="email" info="ok" name="email"
+                        info={this.state.email.info}
+                         style={this.state.email.style}
+                         validate={this.validateemail}>email：</InputElement>
+                    <p style={{textAlign:"center"}}><input type="button" value="注册" onClick={this.isreg}/></p>
+                </form>
+            }
+        });
